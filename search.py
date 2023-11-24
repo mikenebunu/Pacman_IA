@@ -210,5 +210,3 @@ bfs = breadthFirstSearch
 dfs = depthFirstSearch
 astar = aStarSearch
 ucs = uniformCostSearch
-
-# SALUT IUBIRE MA VEZI MACAIAS PULA LUI DE GIT?
