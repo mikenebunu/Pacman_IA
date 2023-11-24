@@ -18,6 +18,7 @@ Pacman agents (in searchAgents.py).
 """
 
 import util
+from queue import PriorityQueue
 
 class SearchProblem:
     """
@@ -136,10 +137,19 @@ def breadthFirstSearch(problem: SearchProblem):
 
 
 
-def uniformCostSearch(problem: SearchProblem):
+def uniformCostSearch(problem):
     """Search the node of least total cost first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    start_state = problem.getStartState()
+    if problem.isGoalState(start_state):
+        return []
+
+    visited = set()
+
+
+    return []
+
+
+    #util.raiseNotDefined()
 
 def nullHeuristic(state, problem=None):
     """
@@ -149,9 +159,33 @@ def nullHeuristic(state, problem=None):
     return 0
 
 def aStarSearch(problem: SearchProblem, heuristic=nullHeuristic):
-    """Search the node that has the lowest combined cost and heuristic first."""
-    "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    """Search the node that has the lowest combined cost and heuristic first."""    
+    start_state = problem.getStartState()
+    pqueue = util.PriorityQueue()
+    visited = set()
+    pqueue.push((start_state, [], 0), 0)
+
+    while not pqueue.isEmpty():
+        current_state, actions, cost = pqueue.pop()
+        if current_state in visited:
+            continue
+
+        visited.add(current_state)
+
+        if problem.isGoalState(current_state):
+            return actions
+
+        successors = problem.getSuccessors(current_state)
+
+        for successor in successors:
+            next_state, action, intermediate_cost = successor
+            new_cost = cost + intermediate_cost
+            new_state = (next_state, actions + [action], new_cost)
+            priority = new_cost + heuristic(next_state, problem)
+            pqueue.push(new_state, priority)
+    return []
+
+    #util.raiseNotDefined()
 
 
 # Abbreviations
