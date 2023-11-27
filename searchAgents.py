@@ -358,6 +358,7 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     walls = problem.walls # These are the walls of the maze, as a Grid (game.py)
 
     "*** YOUR CODE HERE ***"
+    #merge?
     return 0 # Default to trivial solution
 
 class AStarCornersAgent(SearchAgent):
