@@ -275,7 +275,7 @@ class CornersProblem(search.SearchProblem):
     This search problem finds paths through all four corners of a layout.
     """
 
-    def __init__(self, startingGameState: pacman.GameState):
+    def __init__(self, startingGameState):
         """
         Stores the walls, pacman's starting position, and corners.
         """
@@ -292,15 +292,15 @@ class CornersProblem(search.SearchProblem):
         """
         Returns the start state (in your state space, not the full Pacman state space)
         """
-        return (self.startingPosition, tuple())
+        return (self.startingPosition, 0)
 
-    def isGoalState(self, state: Tuple):
+    def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
-        return len(state[1]) == len(self.corners)
+        return state[1] == 0b1111  # All four corners visited (represented as 0b1111)
 
-    def getSuccessors(self, state: Tuple):
+    def getSuccessors(self, state):
         """
         Returns successor states, the actions they require, and a cost of 1.
         """
@@ -313,9 +313,10 @@ class CornersProblem(search.SearchProblem):
             next_x, next_y = int(x + dx), int(y + dy)
             if not self.walls[next_x][next_y]:
                 next_position = (next_x, next_y)
-                new_visited_corners = tuple(
-                    corner for corner in self.corners if corner in visited_corners or corner != next_position
-                )
+                new_visited_corners = visited_corners
+                for i, corner in enumerate(self.corners):
+                    if next_position == corner:
+                        new_visited_corners |= (1 << i)  # Update visited corners using bitwise OR
                 successors.append(((next_position, new_visited_corners), action, 1))
 
         self._expanded += 1  # DO NOT CHANGE
@@ -339,7 +340,7 @@ class CornersProblem(search.SearchProblem):
                 return 999999
             cost += 1
         return cost
-    
+
 
 def cornersHeuristic(state: Any, problem: CornersProblem):
     """
