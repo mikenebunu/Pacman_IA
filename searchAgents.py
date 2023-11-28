@@ -448,21 +448,16 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     """
     Your heuristic for the FoodSearchProblem goes here.
 
-    This heuristic must be consistent to ensure correctness.  First, try to come
+    This heuristic must be consistent to ensure correctness. First, try to come
     up with an admissible heuristic; almost all admissible heuristics will be
     consistent as well.
 
-    If using A* ever finds a solution that is worse uniform cost search finds,
-    your heuristic is *not* consistent, and probably not admissible!  On the
-    other hand, inadmissible or inconsistent heuristics may find optimal
-    solutions, so be careful.
-
-    The state is a tuple ( pacmanPosition, foodGrid ) where foodGrid is a Grid
+    The state is a tuple (pacmanPosition, foodGrid) where foodGrid is a Grid
     (see game.py) of either True or False. You can call foodGrid.asList() to get
     a list of food coordinates instead.
 
     If you want access to info like walls, capsules, etc., you can query the
-    problem.  For example, problem.walls gives you a Grid of where the walls
+    problem. For example, problem.walls gives you a Grid of where the walls
     are.
 
     If you want to *store* information to be reused in other calls to the
@@ -472,9 +467,24 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     Subsequent calls to this heuristic can access
     problem.heuristicInfo['wallCount']
     """
-    position, foodGrid = state
-    "*** YOUR CODE HERE ***"
-    return 0
+    pacmanPosition, foodGrid = state
+
+    # Find the remaining food coordinates
+    remaining_food = foodGrid.asList()
+
+    # If no remaining food, the heuristic value is 0 (goal state)
+    if not remaining_food:
+        return 0
+
+    # Calculate the distance to the nearest food pellet from Pacman's position using mazeDistance
+    distances_to_food = []
+    for food_position in remaining_food:
+        distance = mazeDistance(pacmanPosition, food_position, problem.startingGameState)
+        distances_to_food.append(distance)
+
+    # Return the maximum distance as a heuristic value
+    return max(distances_to_food)
+
 
 class ClosestDotSearchAgent(SearchAgent):
     "Search for all food using a sequence of searches"
