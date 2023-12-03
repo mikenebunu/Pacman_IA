@@ -292,13 +292,13 @@ class CornersProblem(search.SearchProblem):
         """
         Returns the start state (in your state space, not the full Pacman state space)
         """
-        return (self.startingPosition, 0)
+        return (self.startingPosition, 0) # initial state and 0 as the bitmask
 
     def isGoalState(self, state):
         """
         Returns whether this search state is a goal state of the problem.
         """
-        return state[1] == 0b1111  # All four corners visited (represented as 0b1111)
+        return state[1] == 0b1111  # all four corners are visited w 0b1111 as the bitmask
 
     def getSuccessors(self, state):
         """
@@ -307,17 +307,21 @@ class CornersProblem(search.SearchProblem):
         successors = []
         position, visited_corners = state
 
+        #exploring possible directions/actions
+
         for action in [Directions.NORTH, Directions.SOUTH, Directions.EAST, Directions.WEST]:
             x, y = position
             dx, dy = Actions.directionToVector(action)
             next_x, next_y = int(x + dx), int(y + dy)
+            #if the next position is not a wall
             if not self.walls[next_x][next_y]:
                 next_position = (next_x, next_y)
                 new_visited_corners = visited_corners
+                #if the next position is one of the corners
                 for i, corner in enumerate(self.corners):
                     if next_position == corner:
-                        new_visited_corners |= (1 << i)  # Update visited corners using bitwise OR
-                successors.append(((next_position, new_visited_corners), action, 1))
+                        new_visited_corners |= (1 << i)  # update the visited corners w bitwise OR
+                successors.append(((next_position, new_visited_corners), action, 1)) # update the list
 
         self._expanded += 1  # DO NOT CHANGE
         return successors
@@ -355,29 +359,32 @@ def cornersHeuristic(state: Any, problem: CornersProblem):
     shortest path from the state to a goal of the problem; i.e.  it should be
     admissible (as well as consistent).
     """
+
+    #the sum of the minimum distances from the current position to each unvisited corner in the CornersProblem
+    
     corners = problem.corners  # These are the corner coordinates
     walls = problem.walls  # These are the walls of the maze, as a Grid (game.py)
 
-    # Unpack the current state information
+    #  current state information
     position, visited_corners = state
 
-    # Initialize variables
+    # list of unvisited corners - bitwise comparison with the visited_corners bitmask
     unvisited_corners = [corners[i] for i in range(4) if not visited_corners & (1 << i)]
     heuristic = 0
 
-    # If there are unvisited corners, calculate heuristic
+    # if unvisited corners, calculate heuristic
     while unvisited_corners:
         min_distance = float('inf')
 
         for corner in unvisited_corners:
-            # Calculate Manhattan distance from current position to each unvisited corner
+            # Manhattan distance from current position to each unvisited corner
             distance = abs(position[0] - corner[0]) + abs(position[1] - corner[1])
-            min_distance = min(min_distance, distance)
+            min_distance = min(min_distance, distance) #update the minimum distance
 
-        heuristic += min_distance  # Add minimum distance to heuristic
-        # Update current position to the closest corner found
+        heuristic += min_distance  # add minimum distance 
+        # update current position to the closest corner found
         position = min(unvisited_corners, key=lambda x: abs(position[0] - x[0]) + abs(position[1] - x[1]))
-        unvisited_corners.remove(position)  # Remove visited corner from unvisited list
+        unvisited_corners.remove(position)  # remove the visited corner from unvisited list
 
     return heuristic
 
@@ -468,22 +475,19 @@ def foodHeuristic(state: Tuple[Tuple, List[List]], problem: FoodSearchProblem):
     problem.heuristicInfo['wallCount']
     """
     pacmanPosition, foodGrid = state
+    remaining = foodGrid.asList() # remaining food coordinates
 
-    # Find the remaining food coordinates
-    remaining_food = foodGrid.asList()
-
-    # If no remaining food, the heuristic value is 0 (goal state)
-    if not remaining_food:
+    # if no remaining food, heuristic = 0 
+    if not remaining:
         return 0
 
-    # Calculate the distance to the nearest food pellet from Pacman's position using mazeDistance
+    # the distance to the nearest food 
     distances_to_food = []
-    for food_position in remaining_food:
-        distance = mazeDistance(pacmanPosition, food_position, problem.startingGameState)
+    for food_poz in remaining:
+        distance = mazeDistance(pacmanPosition, food_poz, problem.startingGameState)
         distances_to_food.append(distance)
-
-    # Return the maximum distance as a heuristic value
-    return max(distances_to_food)
+    
+    return max(distances_to_food) # maximum distance as heuristic value
 
 
 class ClosestDotSearchAgent(SearchAgent):
@@ -510,7 +514,7 @@ class ClosestDotSearchAgent(SearchAgent):
         # Perform the search to find the path to the closest dot
         "*** YOUR CODE HERE ***"
         # Create a search algorithm instance (e.g., BFS or DFS)
-        search_algorithm = search.bfs  # Replace this with your chosen search algorithm
+        search_algorithm = search.bfs  
 
         # Find a path using the search algorithm and problem instance
         path = search_algorithm(problem)
